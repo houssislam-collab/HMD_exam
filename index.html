@@ -11,10 +11,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
-        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background-color: #0f172a; color: white; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background-color: #0f172a; color: white; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .modal-enter { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        /* المنطقة السرية للمدير */
+        .admin-trigger { position: absolute; top: 0; left: 0; width: 60px; height: 60px; cursor: pointer; z-index: 50; opacity: 0; }
     </style>
 </head>
 <body>
@@ -53,6 +55,22 @@
             const [typ, setTyp] = useState(null);
             const [allFiles, setAllFiles] = useState([]);
             const [openFileUrl, setOpenFileUrl] = useState(null);
+            
+            // حالة نظام تسجيل الدخول
+            const [showLogin, setShowLogin] = useState(false);
+            const [passInput, setPassInput] = useState("");
+            const ADMIN_PASSWORD = "hmd_admin_2026"; // يمكنك تغيير كلمة السر هنا
+
+            const handleLoginSubmit = (e) => {
+                e.preventDefault();
+                if (passInput === ADMIN_PASSWORD) {
+                    setV('admin');
+                    setShowLogin(false);
+                    setPassInput("");
+                } else {
+                    alert("⚠️ كلمة السر غير صحيحة!");
+                }
+            };
 
             useEffect(() => {
                 if (!window.hmdDB) return;
@@ -98,37 +116,63 @@
                 await window.hmdStore.addDoc(window.hmdStore.collection(window.hmdDB, "bank_files"), {
                     name: form.fname.value, url: form.furl.value, lvl: form.flvl.value, sub: form.fsub.value, typ: form.ftyp.value, date: new Date()
                 });
-                alert("تمت الإضافة بنجاح!"); form.reset();
+                alert("✅ تم رفع الملف!"); form.reset();
             };
 
             if (v === 'admin') return (
                 <div className="min-h-screen p-6 flex items-center justify-center">
-                    <div className="glass max-w-md w-full p-8 rounded-[40px]">
-                        <button onClick={() => setV('home')} className="text-gray-400 mb-4">← عودة</button>
-                        <h2 className="text-2xl font-black mb-6 text-center italic">إدارة ملفات HMD</h2>
+                    <div className="glass max-w-md w-full p-8 rounded-[40px] shadow-2xl">
+                        <button onClick={() => setV('home')} className="text-gray-400 mb-4 flex items-center gap-2 hover:text-white transition-colors underline">← خروج من لوحة الإدارة</button>
+                        <h2 className="text-2xl font-black mb-6 text-center italic text-indigo-400 underline tracking-widest">إدارة ملفات HMD</h2>
                         <form onSubmit={addFile} className="space-y-4">
-                            <input name="fname" placeholder="اسم الملف" className="w-full p-4 bg-slate-800 rounded-2xl border border-white/5 text-white" required />
-                            <input name="furl" placeholder="رابط Google Drive" className="w-full p-4 bg-slate-800 rounded-2xl border border-white/5 text-white" required />
-                            <select name="flvl" className="w-full p-4 bg-slate-800 rounded-2xl text-white">
-                                {['1', '2', '3', '4', 'BEM'].map(l => <option key={l} value={l}>{l === 'BEM' ? 'شهادة التعليم المتوسط' : l + ' متوسط'}</option>)}
+                            <input name="fname" placeholder="اسم الملف" className="w-full p-4 bg-slate-800 rounded-2xl border border-white/5 text-white outline-none focus:ring-2 focus:ring-indigo-500" required />
+                            <input name="furl" placeholder="رابط Google Drive" className="w-full p-4 bg-slate-800 rounded-2xl border border-white/5 text-white outline-none focus:ring-2 focus:ring-indigo-500" required />
+                            <select name="flvl" className="w-full p-4 bg-slate-800 rounded-2xl text-white outline-none cursor-pointer">
+                                {['1', '2', '3', '4', 'BEM'].map(l => <option key={l} value={l} className="bg-slate-900">{l === 'BEM' ? 'شهادة BEM' : l + ' متوسط'}</option>)}
                             </select>
-                            <select name="fsub" className="w-full p-4 bg-slate-800 rounded-2xl text-white">
-                                {subjects.map(s => <option key={s.n} value={s.n}>{s.n}</option>)}
+                            <select name="fsub" className="w-full p-4 bg-slate-800 rounded-2xl text-white outline-none cursor-pointer">
+                                {subjects.map(s => <option key={s.n} value={s.n} className="bg-slate-900">{s.n}</option>)}
                             </select>
-                            <select name="ftyp" className="w-full p-4 bg-slate-800 rounded-2xl text-white">
-                                {types.map(t => <option key={t.n} value={t.n}>{t.n}</option>)}
+                            <select name="ftyp" className="w-full p-4 bg-slate-800 rounded-2xl text-white outline-none cursor-pointer">
+                                {types.map(t => <option key={t.n} value={t.n} className="bg-slate-900">{t.n}</option>)}
                             </select>
-                            <button className="w-full bg-indigo-600 py-4 rounded-2xl font-black">حفظ ونشر</button>
+                            <button className="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-black transition-all shadow-lg active:scale-95">نشر الملف</button>
                         </form>
                     </div>
                 </div>
             );
 
             if (v === 'home') return (
-                <div className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
+                <div className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 relative">
+                    {/* المنطقة السرية - أقصى اليسار فوق */}
+                    <div className="admin-trigger" onClick={() => setShowLogin(true)}></div>
+
+                    {/* نافذة تسجيل الدخول المنبثقة */}
+                    {showLogin && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                            <div className="glass max-w-sm w-full p-8 rounded-[35px] modal-enter border-t-2 border-indigo-500">
+                                <h3 className="text-xl font-black text-center mb-6">منطقة المدير 🔐</h3>
+                                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                                    <input 
+                                        type="password" 
+                                        placeholder="أدخل كلمة السر" 
+                                        className="w-full p-4 bg-white/10 rounded-2xl border border-white/20 text-white outline-none focus:border-indigo-500 text-center"
+                                        autoFocus
+                                        value={passInput}
+                                        onChange={(e) => setPassInput(e.target.value)}
+                                    />
+                                    <div className="flex gap-2">
+                                        <button type="submit" className="flex-1 bg-indigo-600 p-3 rounded-xl font-bold">دخول</button>
+                                        <button type="button" onClick={() => setShowLogin(false)} className="bg-white/10 p-3 rounded-xl font-bold">إلغاء</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="max-w-7xl mx-auto pt-12 text-center">
-                        <div className="inline-block glass rounded-full px-6 py-2 mb-6 cursor-pointer" onClick={() => setV('admin')}>
-                            <span className="text-purple-300 text-sm font-semibold">📚 بنك الفروض والدروس - HMD</span>
+                        <div className="inline-block glass rounded-full px-6 py-2 mb-6">
+                            <span className="text-purple-300 text-sm font-semibold">📚 مكتبتك التعليمية الشاملة - HMD</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-12 italic tracking-tighter">
                             تفوّقك يبدأ من هنا
@@ -155,8 +199,8 @@
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-7xl mx-auto">
                             {['1', '2', '3', '4', 'BEM'].map((l) => (
                                 <button key={l} onClick={() => { setLv(l); setV('subjects'); }}
-                                    className={`glass p-8 rounded-[40px] transition-all transform hover:-translate-y-2 group ${l === 'BEM' ? 'border-yellow-500/50 bg-yellow-500/10' : 'hover:border-purple-400'}`}>
-                                    <div className={`${l === 'BEM' ? 'bg-gradient-to-tr from-yellow-500 to-red-600' : 'bg-gradient-to-tr from-purple-600 to-pink-500'} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:rotate-6 transition-transform`}>
+                                    className={`glass p-8 rounded-[40px] transition-all transform hover:-translate-y-2 group ${l === 'BEM' ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.1)]' : 'hover:border-purple-400'}`}>
+                                    <div className={`${l === 'BEM' ? 'bg-gradient-to-tr from-yellow-500 to-red-600 shadow-yellow-500/50' : 'bg-gradient-to-tr from-purple-600 to-pink-500 shadow-purple-500/50'} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl`}>
                                         <Icon name={l === 'BEM' ? 'award' : 'graduation-cap'} cls="w-8 h-8 text-white" />
                                     </div>
                                     <div className="text-xl font-bold italic text-white">{l === 'BEM' ? 'BEM' : `السنة ${l}`}</div>
@@ -168,19 +212,20 @@
                 </div>
             );
 
+            // أكواد المواد والأنواع والملفات
             if (v === 'subjects') return (
-                <div className="min-h-screen p-6 bg-gradient-to-br from-slate-900 to-purple-900">
-                    <div className="max-w-6xl mx-auto">
-                        <button onClick={() => setV('home')} className="glass px-6 py-2 rounded-2xl mb-8 flex items-center gap-2 text-white">← الرئيسية</button>
-                        <h1 className="text-4xl font-black mb-10 text-center text-white">المواد التعليمية - {lv === 'BEM' ? 'شهادة BEM' : `السنة ${lv}`}</h1>
+                <div className="min-h-screen p-6 bg-slate-900">
+                    <div className="max-w-6xl mx-auto text-white">
+                        <button onClick={() => setV('home')} className="glass px-6 py-2 rounded-2xl mb-8">← الرئيسية</button>
+                        <h1 className="text-4xl font-black mb-10 text-center">المواد التعليمية - {lv === 'BEM' ? 'شهادة BEM' : `السنة ${lv}`}</h1>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                             {subjects.map((s, i) => (
                                 <button key={i} onClick={() => { setSub(s); setV('types'); }}
                                     className="glass p-6 rounded-[35px] hover:border-blue-400 transition-all text-center group">
-                                    <div className={`bg-gradient-to-br ${s.c} w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform`}>
+                                    <div className={`bg-gradient-to-br ${s.c} w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl`}>
                                         <Icon name={s.i} cls="w-8 h-8 text-white" />
                                     </div>
-                                    <h3 className="font-bold text-lg mb-1 text-white">{s.n}</h3>
+                                    <h3 className="font-bold text-lg mb-1">{s.n}</h3>
                                     <p className="text-gray-400 text-[10px]">{s.d}</p>
                                 </button>
                             ))}
@@ -190,10 +235,10 @@
             );
 
             if (v === 'types') return (
-                <div className="min-h-screen p-6 bg-gradient-to-br from-slate-900 to-blue-900 text-center">
+                <div className="min-h-screen p-6 bg-slate-900 text-center text-white">
                     <div className="max-w-5xl mx-auto">
-                        <button onClick={() => setV('subjects')} className="glass px-6 py-2 rounded-2xl mb-8 text-white">← رجوع</button>
-                        <h1 className="text-4xl font-black mb-10 italic text-white">ماذا تبحث في {sub?.n}؟</h1>
+                        <button onClick={() => setV('subjects')} className="glass px-6 py-2 rounded-2xl mb-8">← رجوع</button>
+                        <h1 className="text-4xl font-black mb-10 italic">أقسام {sub?.n}</h1>
                         <div className="grid md:grid-cols-3 gap-6">
                             {types.map((t, i) => (
                                 <button key={i} onClick={() => { setTyp(t); setV('files'); }}
@@ -201,7 +246,7 @@
                                     <div className={`bg-gradient-to-tr ${t.c} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl`}>
                                         <Icon name={t.i} cls="w-8 h-8 text-white" />
                                     </div>
-                                    <h3 className="text-xl font-black text-white">{t.n}</h3>
+                                    <h3 className="text-xl font-black">{t.n}</h3>
                                 </button>
                             ))}
                         </div>
@@ -214,11 +259,11 @@
             return (
                 <div className="min-h-screen p-6 bg-slate-900 text-white">
                     {openFileUrl && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4">
-                            <div className="glass w-full h-full max-w-5xl rounded-[40px] overflow-hidden flex flex-col modal-enter">
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black p-4">
+                            <div className="glass w-full h-full max-w-5xl rounded-[40px] overflow-hidden flex flex-col modal-enter border-2 border-white/10">
                                 <div className="p-4 flex justify-between items-center border-b border-white/10">
-                                    <span className="font-bold">معاينة الملف</span>
-                                    <button onClick={() => setOpenFileUrl(null)} className="bg-red-500/20 text-red-500 p-2 rounded-xl">إغلاق</button>
+                                    <span className="font-bold">👀 معاينة الملف</span>
+                                    <button onClick={() => setOpenFileUrl(null)} className="bg-red-500/20 text-red-500 px-4 py-2 rounded-xl hover:bg-red-500 hover:text-white transition-all">إغلاق</button>
                                 </div>
                                 <iframe src={openFileUrl} className="w-full flex-grow border-none"></iframe>
                             </div>
@@ -228,25 +273,25 @@
                         <button onClick={() => setV('types')} className="glass px-6 py-2 rounded-2xl mb-8">← رجوع</button>
                         <div className="glass p-8 rounded-[40px] mb-8 flex justify-between items-center">
                             <div>
-                                <h1 className="text-3xl font-black">{typ?.n}</h1>
+                                <h1 className="text-3xl font-black text-indigo-400">{typ?.n}</h1>
                                 <p className="text-gray-400">{sub?.n} - {lv === 'BEM' ? 'شهادة BEM' : `السنة ${lv} متوسط`}</p>
                             </div>
                             <div className="bg-white/5 p-4 rounded-3xl border border-white/10 text-center min-w-[100px]">
                                 <span className="text-2xl font-black block">{currentFiles.length}</span>
-                                <span className="text-[10px] text-gray-500 font-bold uppercase">ملف</span>
+                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">ملف</span>
                             </div>
                         </div>
                         <div className="space-y-4">
-                            {currentFiles.length === 0 ? <p className="text-center py-10 text-gray-500 italic">لا توجد ملفات مرفوعة حالياً.</p> :
+                            {currentFiles.length === 0 ? <p className="text-center py-10 text-gray-500 italic">لا توجد ملفات في هذا القسم حالياً.</p> :
                                 currentFiles.map(f => (
-                                    <div key={f.id} className="glass p-6 rounded-[30px] flex justify-between items-center gap-4 hover:border-green-500/50 transition-all">
+                                    <div key={f.id} className="glass p-6 rounded-[30px] flex justify-between items-center gap-4 hover:border-green-500/50 transition-all hover:bg-white/[0.07]">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-red-500/20 p-3 rounded-xl"><Icon name="file-text" cls="w-6 h-6 text-red-500" /></div>
+                                            <div className="bg-red-500/10 p-3 rounded-xl"><Icon name="file-text" cls="w-6 h-6 text-red-500" /></div>
                                             <h3 className="font-bold text-lg">{f.name}</h3>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button onClick={() => setOpenFileUrl(formatDriveUrl(f.url, 'preview'))} className="bg-white/5 p-3 rounded-xl hover:bg-white/10"><Icon name="eye" /></button>
-                                            <button onClick={() => window.open(formatDriveUrl(f.url, 'download'), '_blank')} className="bg-green-600 p-3 rounded-xl shadow-lg"><Icon name="download" /></button>
+                                            <button onClick={() => setOpenFileUrl(formatDriveUrl(f.url, 'preview'))} className="bg-white/5 p-3 rounded-xl hover:bg-indigo-600 transition-all"><Icon name="eye" /></button>
+                                            <button onClick={() => window.open(formatDriveUrl(f.url, 'download'), '_blank')} className="bg-green-600/20 text-green-500 p-3 rounded-xl hover:bg-green-600 hover:text-white transition-all"><Icon name="download" /></button>
                                         </div>
                                     </div>
                                 ))
