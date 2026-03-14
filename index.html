@@ -1,1231 +1,989 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMD EDUCATIONAL | المنصة التعليمية الأولى</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نجمة | منصة التعلم الذكي للجزائر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00C896;
+    --green-dark: #00A07A;
+    --green-glow: rgba(0,200,150,0.18);
+    --night: #0B0F1A;
+    --card: #131928;
+    --card2: #1a2235;
+    --border: rgba(0,200,150,0.18);
+    --text: #E8F0F7;
+    --muted: #6B7FA3;
+    --white: #ffffff;
+    --gold: #FFD166;
+    --red: #FF6B6B;
+  }
 
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--night);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-        .gradient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.2;
-            animation: float 20s infinite ease-in-out;
-        }
+  /* BG PATTERN */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,200,150,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,200,150,0.05) 0%, transparent 60%);
+    pointer-events:none; z-index:0;
+  }
 
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-            top: 10%;
-            right: 10%;
-            animation-delay: 0s;
-        }
+  /* ===== NAV ===== */
+  nav {
+    position: sticky; top:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 40px;
+    background: rgba(11,15,26,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    display:flex; align-items:center; gap:10px;
+    font-size:1.5rem; font-weight:900; color:var(--green);
+    letter-spacing:-1px;
+  }
+  .logo-star { font-size:1.8rem; animation: spin 8s linear infinite; display:inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .nav-links { display:flex; gap:8px; }
+  .nav-btn {
+    padding: 7px 18px; border-radius:8px; border:none; cursor:pointer;
+    font-family:'Tajawal',sans-serif; font-size:.95rem; font-weight:500;
+    transition: all .2s;
+  }
+  .nav-btn.ghost {
+    background:transparent; color:var(--muted); border:1px solid transparent;
+  }
+  .nav-btn.ghost:hover { color:var(--text); border-color:var(--border); }
+  .nav-btn.primary {
+    background:var(--green); color:var(--night); font-weight:700;
+  }
+  .nav-btn.primary:hover { background:var(--green-dark); transform:translateY(-1px); }
+  .lang-selector {
+    display:flex; gap:4px;
+  }
+  .lang-btn {
+    padding:5px 10px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--muted); font-size:.82rem; cursor:pointer;
+    font-family:'Space Mono',monospace; transition:all .2s;
+  }
+  .lang-btn.active, .lang-btn:hover {
+    background:var(--green-glow); color:var(--green); border-color:var(--green);
+  }
 
-        .orb-2 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            bottom: 20%;
-            left: 10%;
-            animation-delay: 7s;
-        }
+  /* ===== MAIN LAYOUT ===== */
+  .app { position:relative; z-index:1; }
 
-        .orb-3 {
-            width: 350px;
-            height: 350px;
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
-            top: 50%;
-            left: 50%;
-            animation-delay: 14s;
-        }
+  /* ===== HERO ===== */
+  .hero {
+    text-align:center; padding: 80px 20px 60px;
+    max-width:760px; margin:0 auto;
+    animation: fadeUp .8s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:none} }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 16px; border-radius:999px;
+    border:1px solid var(--border); background:var(--green-glow);
+    color:var(--green); font-size:.85rem; font-weight:600;
+    margin-bottom:24px;
+  }
+  .hero h1 {
+    font-size:3.2rem; font-weight:900; line-height:1.15;
+    margin-bottom:20px;
+  }
+  .hero h1 span { color:var(--green); }
+  .hero p {
+    font-size:1.15rem; color:var(--muted); line-height:1.8;
+    margin-bottom:36px;
+  }
+  .hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn-big {
+    padding:13px 32px; border-radius:10px; border:none; cursor:pointer;
+    font-family:'Tajawal',sans-serif; font-size:1.05rem; font-weight:700;
+    transition:all .2s;
+  }
+  .btn-big.primary { background:var(--green); color:var(--night); }
+  .btn-big.primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,200,150,.3); }
+  .btn-big.outline {
+    background:transparent; color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn-big.outline:hover { border-color:var(--green); color:var(--green); background:var(--green-glow); }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(30px, -30px); }
-            66% { transform: translate(-20px, 20px); }
-        }
+  /* ===== STATS ===== */
+  .stats {
+    display:flex; gap:0; justify-content:center;
+    border:1px solid var(--border); border-radius:14px;
+    max-width:700px; margin:0 auto 60px;
+    overflow:hidden;
+    animation: fadeUp .8s .2s ease both;
+  }
+  .stat {
+    flex:1; padding:20px; text-align:center;
+    border-left:1px solid var(--border);
+  }
+  .stat:last-child { border-left:none; }
+  .stat-num { font-size:1.8rem; font-weight:900; color:var(--green); }
+  .stat-label { font-size:.82rem; color:var(--muted); margin-top:2px; }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  /* ===== TABS ===== */
+  .tabs-wrap {
+    max-width:1100px; margin:0 auto; padding:0 20px 80px;
+  }
+  .tabs {
+    display:flex; gap:4px; margin-bottom:28px;
+    background:var(--card); border-radius:12px; padding:5px;
+    border:1px solid var(--border);
+    overflow-x:auto;
+  }
+  .tab {
+    flex:1; min-width:120px; padding:10px 16px; border-radius:8px; border:none;
+    background:transparent; color:var(--muted);
+    font-family:'Tajawal',sans-serif; font-size:.95rem; font-weight:500;
+    cursor:pointer; transition:all .2s; white-space:nowrap;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .tab.active {
+    background:var(--green); color:var(--night); font-weight:700;
+  }
+  .tab:hover:not(.active) { color:var(--text); background:var(--card2); }
 
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
+  /* ===== PANELS ===== */
+  .panel { display:none; animation: fadeUp .4s ease; }
+  .panel.active { display:block; }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #fff 0%, #e9d5ff 50%, #fce7f3 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  /* ===== CHAT PANEL ===== */
+  .chat-layout {
+    display:grid; grid-template-columns:280px 1fr; gap:16px; height:580px;
+  }
+  .chat-sidebar {
+    background:var(--card); border-radius:14px; border:1px solid var(--border);
+    padding:16px; display:flex; flex-direction:column; gap:10px;
+    overflow-y:auto;
+  }
+  .sidebar-title { font-size:.78rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .subject-btn {
+    padding:10px 14px; border-radius:9px; border:1px solid transparent;
+    background:var(--card2); color:var(--text); font-family:'Tajawal',sans-serif;
+    font-size:.92rem; cursor:pointer; text-align:right; transition:all .2s;
+    display:flex; align-items:center; gap:10px;
+  }
+  .subject-btn:hover { border-color:var(--border); }
+  .subject-btn.active { border-color:var(--green); background:var(--green-glow); color:var(--green); }
+  .subject-icon { font-size:1.1rem; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  .chat-main {
+    background:var(--card); border-radius:14px; border:1px solid var(--border);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .chat-header {
+    padding:14px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+  }
+  .ai-avatar {
+    width:36px; height:36px; border-radius:50%;
+    background:linear-gradient(135deg, var(--green), #0077ff);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem;
+  }
+  .chat-title { font-weight:700; }
+  .chat-subtitle { font-size:.78rem; color:var(--muted); }
+  .online-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    margin-right:auto; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-        .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
+  .chat-messages {
+    flex:1; overflow-y:auto; padding:16px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .chat-messages::-webkit-scrollbar { width:4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 
-        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
-        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
-        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
-        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+  .msg {
+    max-width:80%; display:flex; flex-direction:column; gap:4px;
+  }
+  .msg.user { align-self:flex-start; }
+  .msg.ai { align-self:flex-end; }
+  .msg-bubble {
+    padding:10px 14px; border-radius:12px; font-size:.95rem; line-height:1.7;
+  }
+  .msg.user .msg-bubble {
+    background:var(--card2); border:1px solid var(--border);
+  }
+  .msg.ai .msg-bubble {
+    background:linear-gradient(135deg, rgba(0,200,150,.15), rgba(0,119,255,.1));
+    border:1px solid rgba(0,200,150,.25);
+  }
+  .msg-time { font-size:.72rem; color:var(--muted); padding:0 4px; }
 
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
+  .chat-input-area {
+    padding:14px 16px; border-top:1px solid var(--border);
+    display:flex; gap:10px; align-items:flex-end;
+  }
+  .chat-textarea {
+    flex:1; background:var(--card2); border:1px solid var(--border);
+    border-radius:10px; padding:10px 14px; color:var(--text);
+    font-family:'Tajawal',sans-serif; font-size:.95rem;
+    resize:none; min-height:44px; max-height:120px;
+    outline:none; transition:border-color .2s;
+  }
+  .chat-textarea:focus { border-color:var(--green); }
+  .chat-textarea::placeholder { color:var(--muted); }
+  .send-btn {
+    width:44px; height:44px; border-radius:10px; border:none;
+    background:var(--green); color:var(--night); cursor:pointer;
+    font-size:1.1rem; transition:all .2s; flex-shrink:0;
+  }
+  .send-btn:hover { transform:scale(1.05); background:var(--green-dark); }
+  .send-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5);
-        }
+  /* ===== QUIZ PANEL ===== */
+  .quiz-setup { max-width:620px; margin:0 auto; }
+  .setup-card {
+    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:30px;
+  }
+  .setup-card h2 { font-size:1.4rem; font-weight:800; margin-bottom:6px; }
+  .setup-card p { color:var(--muted); margin-bottom:24px; font-size:.95rem; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-label { font-size:.82rem; color:var(--muted); font-weight:600; }
+  .form-select, .form-input {
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:8px; padding:10px 12px; color:var(--text);
+    font-family:'Tajawal',sans-serif; font-size:.95rem; outline:none;
+    transition:border-color .2s;
+  }
+  .form-select:focus, .form-input:focus { border-color:var(--green); }
+  .form-select option { background:var(--card2); }
 
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            border-radius: 5px;
-        }
+  .quiz-area { display:none; max-width:700px; margin:0 auto; }
+  .quiz-progress-bar {
+    height:4px; background:var(--card); border-radius:4px; margin-bottom:24px; overflow:hidden;
+  }
+  .quiz-progress-fill {
+    height:100%; background:var(--green); border-radius:4px; transition:width .4s ease;
+  }
+  .quiz-q-card {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:28px;
+  }
+  .q-meta { display:flex; justify-content:space-between; margin-bottom:16px; }
+  .q-num { font-size:.85rem; color:var(--muted); }
+  .q-subject { font-size:.85rem; color:var(--green); font-weight:600; }
+  .q-text { font-size:1.1rem; font-weight:600; line-height:1.7; margin-bottom:22px; }
+  .q-options { display:flex; flex-direction:column; gap:10px; }
+  .q-option {
+    padding:13px 16px; border-radius:10px; border:1px solid var(--border);
+    background:var(--card2); color:var(--text); font-family:'Tajawal',sans-serif;
+    font-size:.98rem; cursor:pointer; text-align:right; transition:all .2s;
+    display:flex; align-items:center; gap:12px;
+  }
+  .q-option:hover { border-color:var(--green); background:var(--green-glow); }
+  .q-option.selected { border-color:var(--green); background:var(--green-glow); color:var(--green); font-weight:600; }
+  .q-option.correct { border-color:var(--green); background:rgba(0,200,150,.2); color:var(--green); }
+  .q-option.wrong { border-color:var(--red); background:rgba(255,107,107,.15); color:var(--red); }
+  .option-letter {
+    width:28px; height:28px; border-radius:6px; border:1px solid currentColor;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.82rem; font-family:'Space Mono',monospace; flex-shrink:0;
+  }
+  .q-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+  .q-explain {
+    margin-top:16px; padding:14px; border-radius:10px;
+    background:rgba(0,200,150,.1); border:1px solid rgba(0,200,150,.2);
+    color:var(--text); font-size:.92rem; line-height:1.7; display:none;
+  }
+  .q-explain.show { display:block; animation:fadeUp .3s; }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
+  /* ===== SUMMARY PANEL ===== */
+  .summary-wrap { display:grid; grid-template-columns:300px 1fr; gap:16px; }
+  .summary-sidebar {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:16px; display:flex; flex-direction:column; gap:8px;
+  }
+  .chapter-btn {
+    padding:10px 14px; border-radius:8px; background:var(--card2); border:1px solid transparent;
+    color:var(--text); font-family:'Tajawal',sans-serif; font-size:.9rem; cursor:pointer;
+    text-align:right; transition:all .2s;
+  }
+  .chapter-btn:hover { border-color:var(--border); }
+  .chapter-btn.active { border-color:var(--green); background:var(--green-glow); color:var(--green); }
+  .summary-content {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:28px; min-height:480px; display:flex; flex-direction:column;
+  }
+  .summary-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+  .summary-title { font-size:1.3rem; font-weight:800; }
+  .summary-tag {
+    padding:4px 12px; border-radius:999px; background:var(--green-glow);
+    color:var(--green); font-size:.8rem; font-weight:600; border:1px solid var(--border);
+  }
+  .summary-body { color:var(--text); line-height:2; font-size:.97rem; flex:1; }
+  .summary-body h3 { color:var(--green); font-size:1rem; margin:16px 0 8px; }
+  .summary-body .key-point {
+    display:flex; align-items:flex-start; gap:8px; margin:8px 0;
+    padding:10px 12px; border-radius:8px; background:var(--card2);
+    border-right:3px solid var(--green);
+  }
+  .summary-loading {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; color:var(--muted);
+  }
+  .spinner {
+    width:40px; height:40px; border:3px solid var(--border);
+    border-top-color:var(--green); border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-        }
+  /* ===== SCORE RESULT ===== */
+  .score-card {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:40px; text-align:center; max-width:500px; margin:0 auto;
+  }
+  .score-circle {
+    width:120px; height:120px; border-radius:50%;
+    border:4px solid var(--green); margin:0 auto 20px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .score-num { font-size:2.2rem; font-weight:900; color:var(--green); }
+  .score-total { font-size:.85rem; color:var(--muted); }
 
-        .portal-img {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 1rem 1rem 0 0;
-            position: relative;
-            overflow: hidden;
-        }
+  /* ===== EXERCISES PANEL ===== */
+  .exercises-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .ex-card {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:20px; cursor:pointer; transition:all .25s;
+  }
+  .ex-card:hover { border-color:var(--green); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,200,150,.1); }
+  .ex-icon { font-size:2rem; margin-bottom:10px; }
+  .ex-title { font-size:1rem; font-weight:700; margin-bottom:6px; }
+  .ex-meta { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .ex-badge {
+    padding:3px 10px; border-radius:999px; font-size:.75rem; font-weight:600;
+    border:1px solid var(--border);
+  }
+  .ex-badge.green { background:var(--green-glow); color:var(--green); border-color:rgba(0,200,150,.3); }
+  .ex-badge.gold { background:rgba(255,209,102,.1); color:var(--gold); border-color:rgba(255,209,102,.3); }
+  .ex-badge.red { background:rgba(255,107,107,.1); color:var(--red); border-color:rgba(255,107,107,.3); }
+  .ex-desc { font-size:.88rem; color:var(--muted); line-height:1.6; }
+  .start-ex-btn {
+    margin-top:12px; width:100%; padding:9px; border-radius:8px; border:none;
+    background:var(--green); color:var(--night); font-family:'Tajawal',sans-serif;
+    font-weight:700; font-size:.9rem; cursor:pointer; transition:all .2s;
+  }
+  .start-ex-btn:hover { background:var(--green-dark); }
 
-        .portal-img::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
-        }
+  /* LOADING DOTS */
+  .typing-dots { display:flex; gap:4px; align-items:center; padding:4px 0; }
+  .typing-dots span {
+    width:7px; height:7px; border-radius:50%; background:var(--green);
+    animation:bounce .9s infinite;
+  }
+  .typing-dots span:nth-child(2){animation-delay:.15s}
+  .typing-dots span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-        .portal-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s;
-        }
-
-        .glass-card:hover .portal-img img {
-            transform: scale(1.1);
-        }
-
-        .icon-wrapper {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            transition: all 0.3s;
-        }
-
-        .glass-card:hover .icon-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            background: rgba(139, 92, 246, 0.25);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9998;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(8px);
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .modal-box {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            border: 2px solid rgba(139, 92, 246, 0.5);
-            padding: 2rem;
-            border-radius: 1.5rem;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.4s ease-out;
-            position: relative;
-            z-index: 9999;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            color: white;
-            margin-bottom: 1rem;
-            outline: none;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-        }
-
-        .input-field:focus {
-            border-color: rgba(139, 92, 246, 0.5);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-
-        .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        select.input-field {
-            cursor: pointer;
-            position: relative;
-            z-index: 10;
-        }
-
-        select.input-field option {
-            background: #1e1b4b;
-            color: white;
-            padding: 0.5rem;
-        }
-
-        .floating-btn {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            border: none;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
-            z-index: 99;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .floating-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .success-message {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.5);
-            color: #4ade80;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            color: #f87171;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #8b5cf6, #ec4899);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .file-input-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: rgba(139, 92, 246, 0.1);
-            border: 2px dashed rgba(139, 92, 246, 0.4);
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-        }
-
-        .file-input-label:hover {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.6);
-        }
-
-        .file-input-label.has-file {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: rgba(34, 197, 94, 0.4);
-            color: #4ade80;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .upload-option-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .upload-tab {
-            flex: 1;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .upload-tab.active {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            border-color: transparent;
-            color: white;
-        }
-    </style>
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    nav { padding:12px 16px; }
+    .hero h1 { font-size:2rem; }
+    .chat-layout { grid-template-columns:1fr; height:auto; }
+    .chat-sidebar { display:none; }
+    .summary-wrap { grid-template-columns:1fr; }
+    .exercises-grid { grid-template-columns:1fr 1fr; }
+    .form-grid { grid-template-columns:1fr; }
+  }
+  @media(max-width:480px){
+    .exercises-grid { grid-template-columns:1fr; }
+    .stats { flex-wrap:wrap; }
+  }
+</style>
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
+
+<nav>
+  <div class="logo">
+    <span class="logo-star">✦</span> نجمة
+  </div>
+  <div class="lang-selector">
+    <button class="lang-btn active" onclick="setLang('ar')">AR</button>
+    <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn ghost">تسجيل الدخول</button>
+    <button class="nav-btn primary">ابدأ مجاناً</button>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🇩🇿 للطلاب الجزائريين · متوسط وثانوية</div>
+    <h1>تعلّم أذكى، <span>انجح أسرع</span></h1>
+    <p>منصة تعليمية مدعومة بالذكاء الاصطناعي — اختبارات، ملخصات، تمارين، ومساعد ذكي يشرح لك كل شيء بالعربية والفرنسية</p>
+    <div class="hero-btns">
+      <button class="btn-big primary" onclick="scrollToApp()">ابدأ التعلم الآن ←</button>
+      <button class="btn-big outline">شاهد كيف يعمل</button>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">مادة دراسية</div></div>
+    <div class="stat" style="border-left:1px solid var(--border)"><div class="stat-num">+500</div><div class="stat-label">تمرين جاهز</div></div>
+    <div class="stat" style="border-left:1px solid var(--border)"><div class="stat-num">AI</div><div class="stat-label">مساعد ذكي</div></div>
+    <div class="stat" style="border-left:1px solid var(--border)"><div class="stat-num">مجاني</div><div class="stat-label">للبدء</div></div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div class="tabs-wrap" id="app">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('chat')">
+        <span>🤖</span> المساعد الذكي
+      </button>
+      <button class="tab" onclick="switchTab('quiz')">
+        <span>📝</span> اختبار AI
+      </button>
+      <button class="tab" onclick="switchTab('summary')">
+        <span>📚</span> ملخصات ذكية
+      </button>
+      <button class="tab" onclick="switchTab('exercises')">
+        <span>💪</span> تمارين
+      </button>
     </div>
 
-    <div id="root"></div>
+    <!-- === CHAT PANEL === -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-layout">
+        <div class="chat-sidebar">
+          <div class="sidebar-title">المواد الدراسية</div>
+          <button class="subject-btn active" onclick="selectSubject(this,'الرياضيات')"><span class="subject-icon">📐</span> الرياضيات</button>
+          <button class="subject-btn" onclick="selectSubject(this,'الفيزياء')"><span class="subject-icon">⚛️</span> الفيزياء</button>
+          <button class="subject-btn" onclick="selectSubject(this,'الكيمياء')"><span class="subject-icon">🧪</span> الكيمياء</button>
+          <button class="subject-btn" onclick="selectSubject(this,'العلوم الطبيعية')"><span class="subject-icon">🌿</span> العلوم الطبيعية</button>
+          <button class="subject-btn" onclick="selectSubject(this,'اللغة العربية')"><span class="subject-icon">📖</span> اللغة العربية</button>
+          <button class="subject-btn" onclick="selectSubject(this,'اللغة الفرنسية')"><span class="subject-icon">🇫🇷</span> اللغة الفرنسية</button>
+          <button class="subject-btn" onclick="selectSubject(this,'التاريخ والجغرافيا')"><span class="subject-icon">🗺️</span> التاريخ والجغرافيا</button>
+          <button class="subject-btn" onclick="selectSubject(this,'الفلسفة')"><span class="subject-icon">🤔</span> الفلسفة</button>
+        </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyBEcm3zu-Rje7qGFII2hFOD9my0-rYQhbA",
-            authDomain: "hmd-exam-c09ce.firebaseapp.com",
-            projectId: "hmd-exam-c09ce",
-            storageBucket: "hmd-exam-c09ce.appspot.com",
-            messagingSenderId: "224558405314",
-            appId: "1:224558405314:web:48ad7854c973e259000d5b"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        window.hmdDB = getFirestore(app);
-        window.hmdStorage = getStorage(app);
-        window.hmdStore = { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp };
-        window.hmdStorageUtils = { ref, uploadBytes, getDownloadURL };
-    </script>
+        <div class="chat-main">
+          <div class="chat-header">
+            <div class="ai-avatar">🤖</div>
+            <div>
+              <div class="chat-title">مساعد نجمة الذكي</div>
+              <div class="chat-subtitle" id="current-subject">الرياضيات</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+          <div class="chat-messages" id="chat-messages">
+            <div class="msg ai">
+              <div class="msg-bubble">
+                مرحباً! 👋 أنا مساعدك الذكي لمادة <strong>الرياضيات</strong>.<br>
+                يمكنك سؤالي عن أي درس، طلب شرح مسألة، أو حل تمرين معك خطوة بخطوة. كيف يمكنني مساعدتك؟
+              </div>
+              <div class="msg-time">الآن</div>
+            </div>
+          </div>
 
-        // كلمة المرور للوصول لنظام الرفع
-        const ADMIN_PASSWORD = "HMD2025";
+          <div class="chat-input-area">
+            <textarea class="chat-textarea" id="chat-input" placeholder="اكتب سؤالك هنا..." rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+              oninput="this.style.height='44px';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        const Icon = ({ name, className = "" }) => {
-            const icons = {
-                'book': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                ),
-                'graduation': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z M12 14v6.5" />
-                    </svg>
-                ),
-                'file': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                ),
-                'arrow-right': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                ),
-                'arrow-left': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                ),
-                'sparkles': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                ),
-                'plus': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                ),
-                'lock': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                ),
-                'x': (
-                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                )
-            };
-            return icons[name] || null;
-        };
+    <!-- === QUIZ PANEL === -->
+    <div class="panel" id="panel-quiz">
+      <div class="quiz-setup" id="quiz-setup">
+        <div class="setup-card">
+          <h2>🎯 اختبار مولّد بالذكاء الاصطناعي</h2>
+          <p>اختر المادة والمستوى وسيقوم الذكاء الاصطناعي بتوليد اختبار خاص بك</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">المرحلة الدراسية</label>
+              <select class="form-select" id="q-stage">
+                <option>متوسط - السنة الأولى</option>
+                <option>متوسط - السنة الثانية</option>
+                <option>متوسط - السنة الثالثة</option>
+                <option selected>متوسط - السنة الرابعة (BEM)</option>
+                <option>ثانوي - السنة الأولى</option>
+                <option>ثانوي - السنة الثانية</option>
+                <option>ثانوي - السنة الثالثة (BAC)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">المادة</label>
+              <select class="form-select" id="q-subject">
+                <option>الرياضيات</option>
+                <option>الفيزياء</option>
+                <option>الكيمياء</option>
+                <option>العلوم الطبيعية</option>
+                <option>اللغة العربية</option>
+                <option>التاريخ والجغرافيا</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">عدد الأسئلة</label>
+              <select class="form-select" id="q-count">
+                <option>5 أسئلة</option>
+                <option selected>10 أسئلة</option>
+                <option>15 سؤالاً</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">المستوى</label>
+              <select class="form-select" id="q-level">
+                <option>سهل</option>
+                <option selected>متوسط</option>
+                <option>صعب</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">موضوع محدد (اختياري)</label>
+              <input class="form-input" id="q-topic" placeholder="مثال: المعادلات من الدرجة الثانية، قوانين نيوتن...">
+            </div>
+          </div>
+          <button class="btn-big primary" style="width:100%" onclick="generateQuiz()">⚡ توليد الاختبار بالذكاء الاصطناعي</button>
+        </div>
+      </div>
 
-        const App = () => {
-            const [view, setView] = useState('landing');
-            const [selYear, setSelYear] = useState(null);
-            const [selBranch, setSelBranch] = useState(null);
-            const [selSubject, setSelSubject] = useState(null);
-            const [selType, setSelType] = useState(null);
-            const [allFiles, setAllFiles] = useState([]);
-            const [isLoading, setIsLoading] = useState(true);
-            
-            // حالات نظام الرفع
-            const [showPasswordModal, setShowPasswordModal] = useState(false);
-            const [showUploadModal, setShowUploadModal] = useState(false);
-            const [passwordInput, setPasswordInput] = useState('');
-            const [isAuthenticated, setIsAuthenticated] = useState(false);
-            const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
-            const [uploadMode, setUploadMode] = useState('file'); // 'file' or 'link'
-            const [selectedFile, setSelectedFile] = useState(null);
-            const [uploadProgress, setUploadProgress] = useState(0);
-            const [isUploading, setIsUploading] = useState(false);
-            const [newFile, setNewFile] = useState({ 
-                name: '', 
-                url: '', 
-                year: '', 
-                subject: '', 
-                type: '' 
-            });
+      <div class="quiz-area" id="quiz-area">
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="q-progress"></div></div>
+        <div class="quiz-q-card" id="q-card">
+          <!-- injected by JS -->
+        </div>
+        <div style="text-align:center;margin-top:16px">
+          <button class="btn-big outline" onclick="resetQuiz()">← إعادة الإعداد</button>
+        </div>
+      </div>
+    </div>
 
-            useEffect(() => {
-                const checkDB = setInterval(() => {
-                    if (window.hmdDB) {
-                        const q = window.hmdStore.query(
-                            window.hmdStore.collection(window.hmdDB, "bank_files"),
-                            window.hmdStore.orderBy("date", "desc")
-                        );
-                        window.hmdStore.onSnapshot(q, (snap) => {
-                            const data = [];
-                            snap.forEach(doc => data.push({id: doc.id, ...doc.data()}));
-                            setAllFiles(data);
-                            setIsLoading(false);
-                        });
-                        clearInterval(checkDB);
-                    }
-                }, 500);
-                return () => clearInterval(checkDB);
-            }, []);
+    <!-- === SUMMARY PANEL === -->
+    <div class="panel" id="panel-summary">
+      <div class="summary-wrap">
+        <div class="summary-sidebar">
+          <div class="sidebar-title">الدروس</div>
+          <button class="chapter-btn active" onclick="loadSummary(this,'الأعداد الحقيقية','الرياضيات - ثانوي')">الأعداد الحقيقية</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'المشتقات','الرياضيات - ثانوي')">المشتقات</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'التكامل','الرياضيات - ثانوي')">التكامل</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'الحركة الانتقالية','الفيزياء - ثانوي')">الحركة الانتقالية</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'قوانين نيوتن','الفيزياء - ثانوي')">قوانين نيوتن</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'الكيمياء العضوية','الكيمياء - ثانوي')">الكيمياء العضوية</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'الجملة الفعلية','اللغة العربية')">الجملة الفعلية</button>
+          <button class="chapter-btn" onclick="loadSummary(this,'ثورة التحرير','التاريخ')">ثورة التحرير</button>
+          <div style="margin-top:10px">
+            <button class="btn-big primary" style="width:100%;padding:10px;font-size:.9rem" onclick="generateCustomSummary()">
+              ✨ اطلب ملخص مخصص
+            </button>
+          </div>
+        </div>
+        <div class="summary-content" id="summary-content">
+          <div class="summary-loading" id="summary-loading" style="display:none">
+            <div class="spinner"></div>
+            <span>يقوم الذكاء الاصطناعي بإنشاء الملخص...</span>
+          </div>
+          <div id="summary-body-wrap">
+            <div class="summary-header">
+              <div>
+                <div class="summary-title" id="summary-title">الأعداد الحقيقية</div>
+                <div style="color:var(--muted);font-size:.85rem;margin-top:4px" id="summary-sub">الرياضيات - ثانوي</div>
+              </div>
+              <span class="summary-tag">ملخص ذكي ✨</span>
+            </div>
+            <div class="summary-body" id="summary-text">
+              <p>سيتم تحميل الملخص هنا عند الضغط على درس أو طلب ملخص مخصص.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            const handlePasswordSubmit = () => {
-                if (passwordInput === ADMIN_PASSWORD) {
-                    setIsAuthenticated(true);
-                    setShowPasswordModal(false);
-                    setShowUploadModal(true);
-                    setPasswordInput('');
-                    setUploadMessage({ type: '', text: '' });
-                } else {
-                    setUploadMessage({ type: 'error', text: 'كلمة المرور غير صحيحة!' });
-                    setPasswordInput('');
-                }
-            };
+    <!-- === EXERCISES PANEL === -->
+    <div class="panel" id="panel-exercises">
+      <div class="exercises-grid">
+        <div class="ex-card">
+          <div class="ex-icon">📐</div>
+          <div class="ex-title">الرياضيات — الدوال</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">ثانوي</span>
+            <span class="ex-badge gold">متوسط</span>
+          </div>
+          <div class="ex-desc">تمارين على دراسة الدوال، الاشتقاق، والتكامل مع شرح مفصل لكل خطوة.</div>
+          <button class="start-ex-btn" onclick="startExercise('الرياضيات — الدوال')">حل مع المساعد الذكي ←</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-icon">⚛️</div>
+          <div class="ex-title">الفيزياء — الميكانيك</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">ثانوي</span>
+            <span class="ex-badge red">صعب</span>
+          </div>
+          <div class="ex-desc">مسائل في قوانين نيوتن، الطاقة، والحركة مع رسوم توضيحية.</div>
+          <button class="start-ex-btn" onclick="startExercise('الفيزياء — الميكانيك')">حل مع المساعد الذكي ←</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-icon">🧪</div>
+          <div class="ex-title">الكيمياء — التفاعلات</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">ثانوي</span>
+            <span class="ex-badge gold">متوسط</span>
+          </div>
+          <div class="ex-desc">معادلات كيميائية، حسابات المولات والتراكيز مع أمثلة تطبيقية.</div>
+          <button class="start-ex-btn" onclick="startExercise('الكيمياء — التفاعلات')">حل مع المساعد الذكي ←</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-icon">🌿</div>
+          <div class="ex-title">العلوم — الوراثة</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">متوسط</span>
+            <span class="ex-badge gold">متوسط</span>
+          </div>
+          <div class="ex-desc">تمارين مندل، التوارث، والطفرات الجينية بأسلوب مبسط.</div>
+          <button class="start-ex-btn" onclick="startExercise('العلوم — الوراثة')">حل مع المساعد الذكي ←</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-icon">📖</div>
+          <div class="ex-title">عربية — التعبير الكتابي</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">BAC</span>
+            <span class="ex-badge gold">متوسط</span>
+          </div>
+          <div class="ex-desc">مواضيع إنشائية بالتصحيح الذكي وتحليل الأخطاء اللغوية.</div>
+          <button class="start-ex-btn" onclick="startExercise('عربية — التعبير الكتابي')">حل مع المساعد الذكي ←</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-icon">🗺️</div>
+          <div class="ex-title">التاريخ — ثورة نوفمبر</div>
+          <div class="ex-meta">
+            <span class="ex-badge green">BEM</span>
+            <span class="ex-badge green">BAC</span>
+          </div>
+          <div class="ex-desc">أسئلة وثائقية وتحليلية حول ثورة التحرير الجزائرية.</div>
+          <button class="start-ex-btn" onclick="startExercise('التاريخ — ثورة نوفمبر')">حل مع المساعد الذكي ←</button>
+        </div>
+      </div>
+    </div>
 
-            const handleFileSelect = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    if (file.type === 'application/pdf') {
-                        setSelectedFile(file);
-                        if (!newFile.name) {
-                            setNewFile({...newFile, name: file.name.replace('.pdf', '')});
-                        }
-                        setUploadMessage({ type: '', text: '' });
-                    } else {
-                        setUploadMessage({ type: 'error', text: 'يرجى اختيار ملف PDF فقط' });
-                        setSelectedFile(null);
-                    }
-                }
-            };
+  </div>
+</div>
 
-            const handleUpload = async () => {
-                // التحقق من الحقول المطلوبة
-                if (!newFile.name || !newFile.year || !newFile.subject || !newFile.type) {
-                    setUploadMessage({ type: 'error', text: 'يرجى ملء كافة الحقول' });
-                    return;
-                }
+<script>
+// ======= GLOBALS =======
+let currentSubject = 'الرياضيات';
+let quizQuestions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let chatHistory = [];
 
-                // التحقق من وجود ملف أو رابط
-                if (uploadMode === 'file' && !selectedFile) {
-                    setUploadMessage({ type: 'error', text: 'يرجى اختيار ملف PDF' });
-                    return;
-                }
+// ======= NAV =======
+function setLang(l) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
 
-                if (uploadMode === 'link' && !newFile.url) {
-                    setUploadMessage({ type: 'error', text: 'يرجى إدخال رابط الملف' });
-                    return;
-                }
+function scrollToApp() {
+  document.getElementById('app').scrollIntoView({behavior:'smooth'});
+}
 
-                setIsUploading(true);
-                setUploadProgress(0);
-                
-                try {
-                    let fileUrl = newFile.url;
+// ======= TABS =======
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.closest('.tab').classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
 
-                    // رفع الملف إذا كان الوضع هو رفع ملف
-                    if (uploadMode === 'file' && selectedFile) {
-                        setUploadMessage({ type: '', text: 'جاري رفع الملف...' });
-                        
-                        const timestamp = Date.now();
-                        const fileName = `pdfs/${timestamp}_${selectedFile.name}`;
-                        const storageRef = window.hmdStorageUtils.ref(window.hmdStorage, fileName);
-                        
-                        // رفع الملف
-                        setUploadProgress(50);
-                        const uploadResult = await window.hmdStorageUtils.uploadBytes(storageRef, selectedFile);
-                        
-                        // الحصول على رابط التحميل
-                        setUploadProgress(75);
-                        fileUrl = await window.hmdStorageUtils.getDownloadURL(uploadResult.ref);
-                        setUploadProgress(90);
-                    }
+// ======= SUBJECT =======
+function selectSubject(btn, subject) {
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSubject = subject;
+  document.getElementById('current-subject').textContent = subject;
+  addMessage('ai', `تم تغيير المادة إلى **${subject}**. كيف يمكنني مساعدتك؟ 📚`);
+  chatHistory = [];
+}
 
-                    // حفظ البيانات في Firestore
-                    await window.hmdStore.addDoc(
-                        window.hmdStore.collection(window.hmdDB, "bank_files"), 
-                        {
-                            name: newFile.name,
-                            url: fileUrl,
-                            year: newFile.year,
-                            subject: newFile.subject,
-                            type: newFile.type,
-                            date: window.hmdStore.serverTimestamp()
-                        }
-                    );
+// ======= CHAT =======
+function addMessage(role, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
+  const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  div.innerHTML = `
+    <div class="msg-bubble">${formattedText}</div>
+    <div class="msg-time">${new Date().toLocaleTimeString('ar', {hour:'2-digit',minute:'2-digit'})}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
 
-                    setUploadProgress(100);
-                    setUploadMessage({ type: 'success', text: 'تم رفع الملف بنجاح! ✓' });
-                    setNewFile({ name: '', url: '', year: '', subject: '', type: '' });
-                    setSelectedFile(null);
-                    
-                    setTimeout(() => {
-                        setShowUploadModal(false);
-                        setIsAuthenticated(false);
-                        setUploadMessage({ type: '', text: '' });
-                        setIsUploading(false);
-                        setUploadProgress(0);
-                    }, 2000);
-                } catch (e) {
-                    console.error('Upload error:', e);
-                    setUploadMessage({ type: 'error', text: 'حدث خطأ: ' + e.message });
-                    setIsUploading(false);
-                    setUploadProgress(0);
-                }
-            };
+function addTypingIndicator() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typing';
+  div.innerHTML = `<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
 
-            const closeModals = () => {
-                setShowPasswordModal(false);
-                setShowUploadModal(false);
-                setPasswordInput('');
-                setUploadMessage({ type: '', text: '' });
-                setNewFile({ name: '', url: '', year: '', subject: '', type: '' });
-                setSelectedFile(null);
-                setUploadProgress(0);
-                setUploadMode('file');
-                setIsUploading(false);
-            };
+function removeTypingIndicator() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
 
-            const database = {
-                "1 ابتدائي": ["اللغة العربية", "الرياضيات", "التربية الإسلامية", "التربية المدنية", "التربية العلمية"],
-                "2 ابتدائي": ["اللغة العربية", "الرياضيات", "التربية الإسلامية", "التربية المدنية", "التربية العلمية"],
-                "3 ابتدائي": ["اللغة العربية", "الرياضيات", "الفرنسية", "التربية الإسلامية", "التربية المدنية", "التربية العلمية"],
-                "4 ابتدائي": ["اللغة العربية", "الرياضيات", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "التربية العلمية"],
-                "5 ابتدائي": ["اللغة العربية", "الرياضيات", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "التربية العلمية"],
-                "1 متوسط": ["اللغة العربية", "الرياضيات", "علوم الطبيعة والحياة", "العلوم الفيزيائية", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "المعلوماتية", "اللغة الأمازيغية"],
-                "2 متوسط": ["اللغة العربية", "الرياضيات", "علوم الطبيعة والحياة", "العلوم الفيزيائية", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "المعلوماتية", "اللغة الأمازيغية"],
-                "3 متوسط": ["اللغة العربية", "الرياضيات", "علوم الطبيعة والحياة", "العلوم الفيزيائية", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "المعلوماتية", "اللغة الأمازيغية"],
-                "4 متوسط": ["اللغة العربية", "الرياضيات", "علوم الطبيعة والحياة", "العلوم الفيزيائية", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية", "المعلوماتية", "اللغة الأمازيغية"],
-                "BEM": ["اللغة العربية", "الرياضيات", "علوم الطبيعة والحياة", "العلوم الفيزيائية", "الفرنسية", "الإنجليزية", "التاريخ والجغرافيا", "التربية الإسلامية", "التربية المدنية"],
-                "1 ثانوي جذع مشترك علوم وتكنولوجيا": ["الرياضيات", "العلوم الفيزيائية", "علوم الطبيعة والحياة", "اللغة العربية", "اللغة الفرنسية", "اللغة الإنجليزية", "التكنولوجيا", "التاريخ والجغرافيا", "التربية الإسلامية", "المعلوماتية"],
-                "1 ثانوي جذع مشترك آداب": ["اللغة العربية", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "الرياضيات", "علوم الطبيعة والحياة", "التربية الإسلامية", "المعلوماتية"],
-                "علوم تجريبية": ["علوم الطبيعة والحياة", "العلوم الفيزيائية", "الرياضيات", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "رياضيات": ["الرياضيات", "العلوم الفيزيائية", "علوم الطبيعة والحياة", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "تقني رياضي - هندسة ميكانيكية": ["هندسة ميكانيكية", "الرياضيات", "العلوم الفيزيائية", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "تقني رياضي - هندسة كهربائية": ["هندسة كهربائية", "الرياضيات", "العلوم الفيزيائية", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "تقني رياضي - هندسة مدنية": ["هندسة مدنية", "الرياضيات", "العلوم الفيزيائية", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "تقني رياضي - هندسة طرائق": ["هندسة طرائق", "الرياضيات", "العلوم الفيزيائية", "اللغة العربية", "الفلسفة", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "تسيير واقتصاد": ["التسيير المحاسبي والمالي", "الاقتصاد والمناجمنت", "القانون", "الرياضيات", "اللغة العربية", "التاريخ والجغرافيا", "الفلسفة", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية"],
-                "آداب وفلسفة": ["الفلسفة", "اللغة العربية", "التاريخ والجغرافيا", "اللغة الفرنسية", "اللغة الإنجليزية", "الرياضيات", "التربية الإسلامية"],
-                "لغات أجنبية": ["اللغة الثالثة", "اللغة العربية", "اللغة الفرنسية", "اللغة الإنجليزية", "الفلسفة", "التاريخ والجغرافيا", "الرياضيات", "التربية الإسلامية"]
-            };
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
 
-            const fileTypes = ["فروض الفصل 1", "فروض الفصل 2", "فروض الفصل 3", "الاختبارات", "الملخصات", "دروس وتمارين"];
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  input.value = '';
+  input.style.height = '44px';
 
-            const educationLevels = [
-                {
-                    title: "التعليم الابتدائي",
-                    gradient: "from-emerald-500 to-teal-500",
-                    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500",
-                    levels: ["1 ابتدائي", "2 ابتدائي", "3 ابتدائي", "4 ابتدائي", "5 ابتدائي"]
-                },
-                {
-                    title: "التعليم المتوسط",
-                    gradient: "from-blue-500 to-cyan-500",
-                    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=500",
-                    levels: ["1 متوسط", "2 متوسط", "3 متوسط", "4 متوسط", "BEM"]
-                },
-                {
-                    title: "التعليم الثانوي",
-                    gradient: "from-purple-500 to-pink-500",
-                    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=800",
-                    levels: ["السنة 1 ثانوي", "السنة 2 ثانوي", "السنة 3 ثانوي"]
-                },
-                {
-                    title: "منوعات تعليمية",
-                    gradient: "from-pink-500 to-rose-500",
-                    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=500",
-                    isInfo: true
-                }
-            ];
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  addTypingIndicator();
 
-            const resetToMain = () => {
-                setSelYear(null);
-                setSelBranch(null);
-                setSelSubject(null);
-                setSelType(null);
-                setView('landing');
-            };
+  const systemPrompt = `أنت مساعد تعليمي ذكي متخصص في مادة "${currentSubject}" للطلاب الجزائريين في مرحلة المتوسط والثانوية. 
+المنهاج المستخدم هو المنهاج الجزائري. 
+أجب دائماً بالعربية ما لم يطلب الطالب غير ذلك.
+اشرح بأسلوب واضح ومبسط، وإذا طلب الطالب حل تمرين، اشرح كل خطوة بالتفصيل.
+كن ودوداً ومشجعاً. استخدم الإيموجي أحياناً لجعل الشرح ممتعاً.`;
 
-            // الحصول على قائمة السنوات
-            const allYears = Object.keys(database);
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'حدث خطأ، حاول مجدداً.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    removeTypingIndicator();
+    addMessage('ai', reply);
+  } catch(e) {
+    removeTypingIndicator();
+    addMessage('ai', '⚠️ حدث خطأ في الاتصال. تأكد من اتصالك بالإنترنت.');
+  }
+  btn.disabled = false;
+}
 
-            return (
-                <div style={{position: 'relative', minHeight: '100vh', color: 'white'}}>
-                    {/* Header */}
-                    <header style={{
-                        position: 'sticky',
-                        top: 0,
-                        zIndex: 50,
-                        background: 'rgba(15, 23, 42, 0.7)',
-                        backdropFilter: 'blur(20px)',
-                        borderBottom: '1px solid rgba(255,255,255,0.1)',
-                        padding: '1.5rem 1rem'
-                    }}>
-                        <div style={{maxWidth: '1200px', margin: '0 auto', textAlign: 'center'}}>
-                            <h1 className="gradient-text" style={{fontSize: '1.8rem', fontWeight: 900, marginBottom: '0.5rem'}}>
-                                موقع HMD، تفوقك الدراسي يبدأ من هنا !
-                            </h1>
-                            <p style={{color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
-                                <Icon name="sparkles" className="w-5 h-5" />
-                                الموقع الأول لتحضير الفروض والاختبارات في الجزائر
-                            </p>
-                        </div>
-                    </header>
+// ======= QUIZ =======
+async function generateQuiz() {
+  const stage = document.getElementById('q-stage').value;
+  const subject = document.getElementById('q-subject').value;
+  const countStr = document.getElementById('q-count').value;
+  const level = document.getElementById('q-level').value;
+  const topic = document.getElementById('q-topic').value;
+  const count = parseInt(countStr);
 
-                    {/* Floating Upload Button */}
-                    <button 
-                        className="floating-btn"
-                        onClick={() => setShowPasswordModal(true)}
-                        title="رفع ملف جديد"
-                    >
-                        <Icon name="plus" className="w-6 h-6" />
-                    </button>
+  document.getElementById('quiz-setup').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('q-card').innerHTML = `<div style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto 16px"></div><p style="color:var(--muted)">يقوم الذكاء الاصطناعي بتوليد الاختبار...</p></div>`;
 
-                    {/* Password Modal */}
-                    {showPasswordModal && (
-                        <div className="modal-overlay" onClick={closeModals}>
-                            <div className="modal-box" onClick={e => e.stopPropagation()}>
-                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem'}}>
-                                    <h3 className="gradient-text" style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
-                                        تسجيل الدخول
-                                    </h3>
-                                    <button onClick={closeModals} style={{background: 'transparent', border: 'none', color: 'white', cursor: 'pointer'}}>
-                                        <Icon name="x" className="w-6 h-6" />
-                                    </button>
-                                </div>
+  const prompt = `أنت مولّد اختبارات للمنهاج الجزائري. 
+اصنع ${count} سؤال اختيار من متعدد لمادة "${subject}" للمرحلة: "${stage}" بمستوى ${level}${topic ? `، الموضوع: ${topic}` : ''}.
+أجب بـ JSON صالح فقط بهذا الشكل بدون أي نص خارجه:
+[{"q":"نص السؤال","opts":["أ) خيار1","ب) خيار2","ج) خيار3","د) خيار4"],"ans":0,"exp":"شرح الإجابة الصحيحة"}]
+حيث ans هو رقم index الإجابة الصحيحة (0-3).`;
 
-                                {uploadMessage.text && uploadMessage.type === 'error' && (
-                                    <div className="error-message">
-                                        {uploadMessage.text}
-                                    </div>
-                                )}
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    let raw = data.content?.[0]?.text || '[]';
+    raw = raw.replace(/```json|```/g, '').trim();
+    quizQuestions = JSON.parse(raw);
+    currentQ = 0; score = 0;
+    renderQuestion();
+  } catch(e) {
+    document.getElementById('q-card').innerHTML = `<div style="text-align:center;padding:40px"><p style="color:var(--red)">⚠️ حدث خطأ. حاول مجدداً.</p></div>`;
+  }
+}
 
-                                <div style={{textAlign: 'center', marginBottom: '1.5rem'}}>
-                                    <div style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        margin: '0 auto 1rem',
-                                        borderRadius: '50%',
-                                        background: 'rgba(139, 92, 246, 0.2)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '2px solid rgba(139, 92, 246, 0.4)'
-                                    }}>
-                                        <Icon name="lock" className="w-10 h-10" style={{color: '#a78bfa'}} />
-                                    </div>
-                                    <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem'}}>
-                                        أدخل كلمة المرور للوصول إلى لوحة الرفع
-                                    </p>
-                                </div>
+function renderQuestion() {
+  if (currentQ >= quizQuestions.length) {
+    showScore(); return;
+  }
+  answered = false;
+  const q = quizQuestions[currentQ];
+  const pct = (currentQ / quizQuestions.length) * 100;
+  document.getElementById('q-progress').style.width = pct + '%';
 
-                                <input 
-                                    type="password"
-                                    className="input-field"
-                                    placeholder="كلمة المرور"
-                                    value={passwordInput}
-                                    onChange={e => setPasswordInput(e.target.value)}
-                                    onKeyPress={e => e.key === 'Enter' && handlePasswordSubmit()}
-                                    autoFocus
-                                />
+  document.getElementById('q-card').innerHTML = `
+    <div class="q-meta">
+      <span class="q-num">سؤال ${currentQ + 1} من ${quizQuestions.length}</span>
+      <span class="q-subject" style="color:var(--green)">النتيجة: ${score}/${currentQ}</span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-options" id="q-options">
+      ${q.opts.map((opt, i) => `
+        <button class="q-option" onclick="selectAnswer(${i})">
+          <span class="option-letter">${['أ','ب','ج','د'][i]}</span>
+          ${opt}
+        </button>`).join('')}
+    </div>
+    <div class="q-explain" id="q-explain"><strong>💡 التفسير:</strong> ${q.exp}</div>
+    <div class="q-actions">
+      <span style="font-size:.85rem;color:var(--muted)">اختر الإجابة الصحيحة</span>
+      <button class="btn-big primary" style="padding:9px 22px;font-size:.9rem" id="next-btn" onclick="nextQuestion()" disabled>التالي ←</button>
+    </div>`;
+}
 
-                                <div style={{display: 'flex', gap: '0.75rem'}}>
-                                    <button className="btn-primary" style={{flex: 1}} onClick={handlePasswordSubmit}>
-                                        دخول
-                                    </button>
-                                    <button className="btn-secondary" style={{flex: 1}} onClick={closeModals}>
-                                        إلغاء
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizQuestions[currentQ];
+  const btns = document.querySelectorAll('.q-option');
+  btns.forEach((b, i) => {
+    if (i === q.ans) b.classList.add('correct');
+    else if (i === idx && i !== q.ans) b.classList.add('wrong');
+    b.onclick = null;
+  });
+  btns[idx].classList.add('selected');
+  if (idx === q.ans) score++;
+  document.getElementById('q-explain').classList.add('show');
+  document.getElementById('next-btn').disabled = false;
+}
 
-                    {/* Upload Modal */}
-                    {showUploadModal && (
-                        <div className="modal-overlay" onClick={!isUploading ? closeModals : null}>
-                            <div className="modal-box" onClick={e => e.stopPropagation()}>
-                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem'}}>
-                                    <h3 className="gradient-text" style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
-                                        رفع ملف جديد
-                                    </h3>
-                                    {!isUploading && (
-                                        <button onClick={closeModals} style={{background: 'transparent', border: 'none', color: 'white', cursor: 'pointer'}}>
-                                            <Icon name="x" className="w-6 h-6" />
-                                        </button>
-                                    )}
-                                </div>
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
 
-                                {uploadMessage.text && (
-                                    <div className={uploadMessage.type === 'success' ? 'success-message' : 'error-message'}>
-                                        {uploadMessage.text}
-                                    </div>
-                                )}
+function showScore() {
+  const pct = Math.round((score / quizQuestions.length) * 100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '💪';
+  document.getElementById('q-progress').style.width = '100%';
+  document.getElementById('q-card').innerHTML = `
+    <div class="score-card">
+      <div class="score-circle">
+        <div class="score-num">${score}</div>
+        <div class="score-total">من ${quizQuestions.length}</div>
+      </div>
+      <div style="font-size:2rem;margin:12px 0">${emoji}</div>
+      <h2 style="margin-bottom:8px">${pct >= 80 ? 'ممتاز!' : pct >= 60 ? 'جيد!' : 'استمر في المحاولة!'}</h2>
+      <p style="color:var(--muted);margin-bottom:24px">حصلت على ${pct}% في هذا الاختبار</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-big primary" onclick="generateQuiz()">🔄 اختبار جديد</button>
+        <button class="btn-big outline" onclick="resetQuiz()">← تغيير الإعدادات</button>
+      </div>
+    </div>`;
+}
 
-                                {/* Upload Mode Tabs */}
-                                <div className="upload-option-tabs">
-                                    <div 
-                                        className={`upload-tab ${uploadMode === 'file' ? 'active' : ''}`}
-                                        onClick={() => !isUploading && setUploadMode('file')}
-                                        style={{cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.5 : 1}}
-                                    >
-                                        📄 رفع ملف PDF
-                                    </div>
-                                    <div 
-                                        className={`upload-tab ${uploadMode === 'link' ? 'active' : ''}`}
-                                        onClick={() => !isUploading && setUploadMode('link')}
-                                        style={{cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.5 : 1}}
-                                    >
-                                        🔗 رابط الملف
-                                    </div>
-                                </div>
+function resetQuiz() {
+  document.getElementById('quiz-setup').style.display = 'block';
+  document.getElementById('quiz-area').style.display = 'none';
+}
 
-                                {uploadMode === 'file' ? (
-                                    <div className="file-input-wrapper">
-                                        <input 
-                                            type="file"
-                                            id="fileInput"
-                                            accept=".pdf"
-                                            onChange={handleFileSelect}
-                                            disabled={isUploading}
-                                        />
-                                        <label 
-                                            htmlFor="fileInput" 
-                                            className={`file-input-label ${selectedFile ? 'has-file' : ''}`}
-                                            style={{cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.5 : 1}}
-                                        >
-                                            {selectedFile ? (
-                                                <>
-                                                    <Icon name="file" className="w-5 h-5" />
-                                                    <span>{selectedFile.name}</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Icon name="plus" className="w-5 h-5" />
-                                                    <span>اختر ملف PDF</span>
-                                                </>
-                                            )}
-                                        </label>
-                                    </div>
-                                ) : (
-                                    <input 
-                                        className="input-field"
-                                        placeholder="رابط الملف (Google Drive أو أي رابط مباشر)"
-                                        value={newFile.url}
-                                        onChange={e => setNewFile({...newFile, url: e.target.value})}
-                                        disabled={isUploading}
-                                    />
-                                )}
+// ======= SUMMARY =======
+async function loadSummary(btn, title, sub) {
+  document.querySelectorAll('.chapter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-                                {/* Progress Bar */}
-                                {isUploading && uploadProgress > 0 && (
-                                    <div className="progress-bar-container">
-                                        <div className="progress-bar" style={{width: `${uploadProgress}%`}}></div>
-                                    </div>
-                                )}
+  document.getElementById('summary-loading').style.display = 'flex';
+  document.getElementById('summary-body-wrap').style.display = 'none';
 
-                                <input 
-                                    className="input-field"
-                                    placeholder="اسم الملف (مثال: فرض رقم 1)"
-                                    value={newFile.name}
-                                    onChange={e => setNewFile({...newFile, name: e.target.value})}
-                                    disabled={isUploading}
-                                />
+  const prompt = `اكتب ملخصاً دراسياً شاملاً ومنظماً لدرس "${title}" من مادة ${sub} للمنهاج الجزائري.
+الملخص يجب أن يشمل:
+- التعريفات الأساسية
+- القوانين والمفاهيم المهمة  
+- نقاط جوهرية يجب حفظها
+اكتب بأسلوب واضح ومنظم بالعربية. استخدم ### للعناوين الفرعية و- لنقاط القائمة.`;
 
-                                <select 
-                                    className="input-field"
-                                    value={newFile.year}
-                                    onChange={e => setNewFile({...newFile, year: e.target.value})}
-                                    disabled={isUploading}
-                                >
-                                    <option value="">اختر السنة / المستوى</option>
-                                    {allYears.map(year => (
-                                        <option key={year} value={year}>{year}</option>
-                                    ))}
-                                </select>
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || 'حدث خطأ.';
+    const formatted = text
+      .replace(/###\s*(.+)/g, '<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^-\s*(.+)/gm, '<div class="key-point"><span>◆</span><span>$1</span></div>')
+      .replace(/\n\n/g, '<br>');
 
-                                <select 
-                                    className="input-field"
-                                    value={newFile.subject}
-                                    onChange={e => setNewFile({...newFile, subject: e.target.value})}
-                                    disabled={!newFile.year || isUploading}
-                                >
-                                    <option value="">اختر المادة</option>
-                                    {newFile.year && database[newFile.year]?.map(subject => (
-                                        <option key={subject} value={subject}>{subject}</option>
-                                    ))}
-                                </select>
+    document.getElementById('summary-title').textContent = title;
+    document.getElementById('summary-sub').textContent = sub;
+    document.getElementById('summary-text').innerHTML = formatted;
+    document.getElementById('summary-loading').style.display = 'none';
+    document.getElementById('summary-body-wrap').style.display = 'block';
+  } catch(e) {
+    document.getElementById('summary-loading').style.display = 'none';
+    document.getElementById('summary-body-wrap').style.display = 'block';
+    document.getElementById('summary-text').innerHTML = '<p style="color:var(--red)">⚠️ حدث خطأ في الاتصال.</p>';
+  }
+}
 
-                                <select 
-                                    className="input-field"
-                                    value={newFile.type}
-                                    onChange={e => setNewFile({...newFile, type: e.target.value})}
-                                    disabled={isUploading}
-                                >
-                                    <option value="">اختر نوع الملف</option>
-                                    {fileTypes.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
+async function generateCustomSummary() {
+  const topic = prompt('أدخل اسم الدرس أو الموضوع الذي تريد ملخصه:');
+  if (!topic) return;
+  document.getElementById('summary-loading').style.display = 'flex';
+  document.getElementById('summary-body-wrap').style.display = 'none';
+  await loadSummary({classList:{remove:()=>{},add:()=>{}}}, topic, 'طلب مخصص');
+}
 
-                                <div style={{display: 'flex', gap: '0.75rem', marginTop: '1rem'}}>
-                                    <button 
-                                        className="btn-primary" 
-                                        style={{flex: 1, opacity: isUploading ? 0.7 : 1, cursor: isUploading ? 'not-allowed' : 'pointer'}} 
-                                        onClick={handleUpload}
-                                        disabled={isUploading}
-                                    >
-                                        {isUploading ? `جاري الرفع... ${uploadProgress}%` : 'نشر الملف'}
-                                    </button>
-                                    {!isUploading && (
-                                        <button className="btn-secondary" style={{flex: 1}} onClick={closeModals}>
-                                            إلغاء
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
+// ======= EXERCISES =======
+function startExercise(name) {
+  switchTab('chat');
+  document.querySelectorAll('.tab')[0].classList.add('active');
+  setTimeout(() => {
+    document.getElementById('chat-input').value = `أريد حل تمارين عن: ${name}. ابدأ معي بتمرين مناسب واشرح لي الحل خطوة بخطوة.`;
+    sendMessage();
+  }, 300);
+}
 
-                    <main style={{maxWidth: '1400px', margin: '0 auto', padding: '3rem 1rem', position: 'relative', zIndex: 1}}>
-                        {/* Landing View */}
-                        {view === 'landing' && (
-                            <div className="fade-in">
-                                <div style={{textAlign: 'center', marginBottom: '4rem'}}>
-                                    <h2 className="gradient-text" style={{fontSize: 'clamp(2.5rem, 8vw, 5rem)', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-0.02em'}}>
-                                        HMD EDUCATIONAL
-                                    </h2>
-                                    <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'}}>
-                                        <Icon name="sparkles" className="w-5 h-5" />
-                                        المحتوى التعليمي الشامل لجميع الأطوار
-                                    </p>
-                                </div>
-
-                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem'}}>
-                                    {educationLevels.map((level, idx) => (
-                                        <div key={level.title} className={`glass-card fade-in stagger-${(idx % 4) + 1}`} style={{overflow: 'hidden', cursor: level.isInfo ? 'default' : 'pointer'}}>
-                                            <div className="portal-img">
-                                                <img src={level.image} alt={level.title} />
-                                            </div>
-                                            <div style={{padding: '1.5rem'}}>
-                                                <h2 className="gradient-text" style={{fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1.5rem'}}>
-                                                    {level.title}
-                                                </h2>
-                                                {!level.isInfo ? (
-                                                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                                                        {level.levels.map(l => (
-                                                            <button
-                                                                key={l}
-                                                                onClick={() => {
-                                                                    if (l === "السنة 1 ثانوي" || l === "السنة 2 ثانوي" || l === "السنة 3 ثانوي") {
-                                                                        setSelYear(l);
-                                                                        setView('branches');
-                                                                    } else {
-                                                                        setSelYear(l);
-                                                                        setSelBranch(null);
-                                                                        setView('subjects');
-                                                                    }
-                                                                }}
-                                                                style={{
-                                                                    width: '100%',
-                                                                    textAlign: 'right',
-                                                                    padding: '0.75rem 1rem',
-                                                                    color: 'rgba(255,255,255,0.8)',
-                                                                    borderRadius: '0.75rem',
-                                                                    transition: 'all 0.3s',
-                                                                    fontWeight: '500',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'space-between',
-                                                                    background: 'transparent',
-                                                                    border: 'none',
-                                                                    cursor: 'pointer'
-                                                                }}
-                                                                onMouseEnter={(e) => {
-                                                                    e.target.style.background = 'rgba(255,255,255,0.1)';
-                                                                    e.target.style.color = 'white';
-                                                                }}
-                                                                onMouseLeave={(e) => {
-                                                                    e.target.style.background = 'transparent';
-                                                                    e.target.style.color = 'rgba(255,255,255,0.8)';
-                                                                }}
-                                                            >
-                                                                <span>{l === "BEM" ? "شهادة التعليم المتوسط" : l.includes("ثانوي") ? (l.replace("السنة ", "") === "3 ثانوي" ? "البكالوريا BAC" : l) : `السنة ${l}`}</span>
-                                                                <Icon name="arrow-left" className="w-4 h-4" />
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
-                                                        {["تنظيم الوقت", "منهجية الإجابة", "نصائح الامتحانات"].map(item => (
-                                                            <div key={item} style={{padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', fontWeight: '500'}}>
-                                                                {item}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Branches View */}
-                        {view === 'branches' && (
-                            <div className="fade-in">
-                                <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-                                    <button onClick={resetToMain} className="btn-primary" style={{marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
-                                        <Icon name="arrow-right" className="w-5 h-5" />
-                                        العودة للرئيسية
-                                    </button>
-                                    <h2 className="gradient-text" style={{fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, marginBottom: '0.5rem'}}>
-                                        اختر الشعبة
-                                    </h2>
-                                    <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '1.1rem'}}>{selYear}</p>
-                                </div>
-
-                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', maxWidth: '1000px', margin: '0 auto'}}>
-                                    {(selYear === "السنة 1 ثانوي" 
-                                        ? ["1 ثانوي جذع مشترك علوم وتكنولوجيا", "1 ثانوي جذع مشترك آداب"]
-                                        : ["علوم تجريبية", "رياضيات", "تقني رياضي - هندسة ميكانيكية", "تقني رياضي - هندسة كهربائية", "تقني رياضي - هندسة مدنية", "تقني رياضي - هندسة طرائق", "تسيير واقتصاد", "آداب وفلسفة", "لغات أجنبية"]
-                                    ).map((branch, idx) => (
-                                        <div 
-                                            key={branch}
-                                            className={`glass-card fade-in stagger-${(idx % 3) + 1}`}
-                                            onClick={() => { setSelBranch(branch); setView('subjects'); }}
-                                            style={{padding: '2rem', textAlign: 'center', cursor: 'pointer'}}
-                                        >
-                                            <div className="icon-wrapper" style={{margin: '0 auto 1rem'}}>
-                                                <Icon name="graduation" className="w-8 h-8" style={{color: '#a78bfa'}} />
-                                            </div>
-                                            <h3 style={{fontWeight: 'bold', color: 'rgba(255,255,255,0.9)'}}>
-                                                {branch}
-                                            </h3>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Subjects View */}
-                        {view === 'subjects' && (
-                            <div className="fade-in">
-                                <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-                                    <button 
-                                        onClick={() => setView(selBranch ? 'branches' : 'landing')}
-                                        className="btn-primary"
-                                        style={{marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}
-                                    >
-                                        <Icon name="arrow-right" className="w-5 h-5" />
-                                        العودة للخلف
-                                    </button>
-                                    <h2 className="gradient-text" style={{fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, marginBottom: '0.5rem'}}>
-                                        {selBranch || selYear}
-                                    </h2>
-                                    <p style={{color: 'rgba(255,255,255,0.6)'}}>اختر المادة للمتابعة</p>
-                                </div>
-
-                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', maxWidth: '1200px', margin: '0 auto'}}>
-                                    {(database[selBranch || selYear] || []).map((subject, idx) => (
-                                        <div 
-                                            key={subject}
-                                            className={`glass-card fade-in stagger-${(idx % 4) + 1}`}
-                                            onClick={() => { setSelSubject(subject); setView('types'); }}
-                                            style={{padding: '1.5rem', textAlign: 'center', cursor: 'pointer'}}
-                                        >
-                                            <div className="icon-wrapper" style={{margin: '0 auto 1rem', width: '48px', height: '48px'}}>
-                                                <Icon name="book" className="w-6 h-6" style={{color: '#818cf8'}} />
-                                            </div>
-                                            <span style={{fontWeight: '600', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', display: 'block'}}>
-                                                {subject}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Types View */}
-                        {view === 'types' && (
-                            <div className="fade-in">
-                                <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-                                    <button 
-                                        onClick={() => setView('subjects')}
-                                        className="btn-primary"
-                                        style={{marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}
-                                    >
-                                        <Icon name="arrow-right" className="w-5 h-5" />
-                                        العودة للمواد
-                                    </button>
-                                    <h2 className="gradient-text" style={{fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, marginBottom: '0.5rem'}}>
-                                        {selSubject}
-                                    </h2>
-                                    <p style={{color: 'rgba(255,255,255,0.6)'}}>اختر نوع المحتوى</p>
-                                </div>
-
-                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', maxWidth: '1000px', margin: '0 auto'}}>
-                                    {fileTypes.map((type, idx) => (
-                                        <div 
-                                            key={type}
-                                            className={`glass-card fade-in stagger-${(idx % 3) + 1}`}
-                                            onClick={() => { setSelType(type); setView('files'); }}
-                                            style={{padding: '2.5rem', textAlign: 'center', cursor: 'pointer'}}
-                                        >
-                                            <div className="icon-wrapper" style={{margin: '0 auto 1rem', width: '64px', height: '64px'}}>
-                                                <Icon name="file" className="w-8 h-8" style={{color: '#a78bfa'}} />
-                                            </div>
-                                            <h3 style={{fontSize: '1.25rem', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)'}}>
-                                                {type}
-                                            </h3>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Files View */}
-                        {view === 'files' && (
-                            <div className="fade-in">
-                                <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-                                    <button 
-                                        onClick={() => setView('types')}
-                                        className="btn-primary"
-                                        style={{marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}
-                                    >
-                                        <Icon name="arrow-right" className="w-5 h-5" />
-                                        العودة للأنواع
-                                    </button>
-                                    <h2 className="gradient-text" style={{fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 900, marginBottom: '0.5rem'}}>
-                                        {selType}
-                                    </h2>
-                                    <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem'}}>{selSubject} - {selBranch || selYear}</p>
-                                </div>
-
-                                <div style={{maxWidth: '800px', margin: '0 auto'}}>
-                                    {isLoading ? (
-                                        <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                                            {[1,2,3].map(i => (
-                                                <div key={i} style={{height: '96px', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', animation: 'pulse 1.5s infinite'}} />
-                                            ))}
-                                        </div>
-                                    ) : allFiles.filter(f => 
-                                        f.year === (selBranch || selYear) && 
-                                        f.subject === selSubject && 
-                                        f.type === selType
-                                    ).length > 0 ? (
-                                        <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                                            {allFiles
-                                                .filter(f => f.year === (selBranch || selYear) && f.subject === selSubject && f.type === selType)
-                                                .map((file, idx) => (
-                                                    <div 
-                                                        key={file.id}
-                                                        className={`glass-card fade-in stagger-${(idx % 3) + 1}`}
-                                                        onClick={() => window.open(file.url, '_blank')}
-                                                        style={{padding: '1.5rem', cursor: 'pointer'}}
-                                                    >
-                                                        <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
-                                                            <div className="icon-wrapper" style={{flexShrink: 0}}>
-                                                                <Icon name="file" className="w-6 h-6" style={{color: '#a78bfa'}} />
-                                                            </div>
-                                                            <div style={{flex: 1, minWidth: 0}}>
-                                                                <h3 style={{fontWeight: '600', color: 'rgba(255,255,255,0.9)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '0.25rem'}}>
-                                                                    {file.name}
-                                                                </h3>
-                                                                <p style={{fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)'}}>
-                                                                    {new Date(file.date?.seconds * 1000).toLocaleDateString('ar-DZ')}
-                                                                </p>
-                                                            </div>
-                                                            <Icon name="arrow-left" className="w-5 h-5" style={{color: 'rgba(255,255,255,0.4)', flexShrink: 0}} />
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    ) : (
-                                        <div style={{textAlign: 'center', padding: '5rem 0'}}>
-                                            <div className="glass-card" style={{display: 'inline-block', padding: '3rem', maxWidth: '400px'}}>
-                                                <Icon name="file" className="w-16 h-16" style={{color: 'rgba(255,255,255,0.3)', margin: '0 auto 1rem', display: 'block'}} />
-                                                <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem'}}>
-                                                    لا توجد ملفات متاحة حالياً
-                                                </p>
-                                                <p style={{color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem'}}>
-                                                    سيتم إضافة المحتوى قريباً
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </main>
-
-                    {/* Footer */}
-                    <footer style={{padding: '2rem 1rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '5rem'}}>
-                        <div className="glass-card" style={{display: 'inline-block', padding: '1rem 2rem'}}>
-                            <p style={{color: 'rgba(255,255,255,0.6)', fontWeight: '500'}}>
-                                © 2025 HMD EDUCATIONAL - جميع الحقوق محفوظة
-                            </p>
-                        </div>
-                    </footer>
-                </div>
-            );
-        };
-
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
+// ======= INIT =======
+// Auto-load first summary on tab open
+document.querySelector('[onclick="switchTab(\'summary\')"]').addEventListener('click', function() {
+  if (!document.getElementById('summary-text').innerHTML.includes('الذكاء')) {
+    const firstBtn = document.querySelector('.chapter-btn');
+    loadSummary(firstBtn, 'الأعداد الحقيقية', 'الرياضيات - ثانوي');
+  }
+});
+</script>
 </body>
 </html>
